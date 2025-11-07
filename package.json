@@ -1,12 +1,45 @@
 {
     "name": "diceware-en",
-    "version": "0.1.0",
-    "module": "index.ts",
+    "description": "English diceware list with useful functions.",
+    "version": "0.1.1",
     "type": "module",
+    "author": "Cícero Mello",
+    "license": "MIT",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsup",
+        "test": "bun test"
+    },
     "devDependencies": {
-        "@types/bun": "latest"
+        "@types/bun": "latest",
+        "tsup": "^8.5.0"
     },
     "peerDependencies": {
         "typescript": "^5"
-    }
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/cicero-mello/diceware-en.git"
+    },
+    "bugs": {
+        "url": "https://github.com/cicero-mello/diceware-en/issues"
+    },
+    "keywords": [
+        "diceware",
+        "random",
+        "generator",
+        "list",
+        "words",
+        "password",
+        "passphrase",
+        "english",
+        "utils",
+        "crypto"
+    ]
 }

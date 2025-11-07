@@ -25,7 +25,8 @@ test("List must be in alphabetic order", () => {
         return normalizedA.localeCompare(normalizedB)
     })
 
-    expect(dicewareEN.words).toEqual(sortedWords)
+    const dicewareWords = dicewareEN.words as unknown as string[]
+    expect(dicewareWords).toEqual(sortedWords)
 })
 
 test("Words must have at least 4 letters", () => {

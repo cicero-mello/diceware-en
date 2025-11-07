@@ -1,1 +1,5 @@
-console.log("Starting the Project!")
+import { words } from "./words"
+
+export const dicewareEN = {
+    words
+}

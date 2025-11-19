@@ -7773,6 +7773,5 @@ export const words = [
     "zombie",
     "zone",
     "zones",
-    "zoom",
-    "zooms"
+    "zoom"
 ] as const

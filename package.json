@@ -1,7 +1,7 @@
 {
     "name": "diceware-en",
     "description": "English diceware list with useful functions.",
-    "version": "0.1.1",
+    "version": "1.0.0",
     "type": "module",
     "author": "Cícero Mello",
     "license": "MIT",
@@ -9,6 +9,9 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "tsup",
+        "update-words": "bun run ./scripts/update-words.ts",
+        "update-blacklist": "bun run ./scripts/update-blacklist.ts",
+        "demo": "bun run ./scripts/demo",
         "test": "bun test"
     },
     "devDependencies": {

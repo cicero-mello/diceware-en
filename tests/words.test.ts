@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test"
 import { dicewareEN } from "../src"
+import fs from "fs/promises"
 
 test("List must have 7776 words", () => {
     expect(dicewareEN.words.length).toBe(7776)
@@ -53,4 +54,17 @@ test("Words must use English alphabet without hyphens", () => {
     )
 
     expect(notEnglishWord).toBe(undefined)
+})
+
+test(`Words in "words.txt" must coincide with words in "words.ts"`, async () => {
+    const textFromTxt = await fs.readFile("words.txt", "utf8")
+
+    const wordsFromTxt = textFromTxt
+        .split(/\r?\n/)
+        .map(w => w.trim())
+        .filter(Boolean)
+
+    wordsFromTxt.forEach((_, i) => {
+        expect(wordsFromTxt[i]).toEqual(dicewareEN.words[i])
+    })
 })

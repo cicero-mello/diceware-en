@@ -1,0 +1,100 @@
+name: CI/CD - (Build, Tests, Bump Version and Publish NPM Package)
+
+on:
+    push:
+        branches:
+            - main
+
+permissions:
+    contents: write
+
+jobs:
+    build-and-tests:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v5
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: Install Dependencies
+              run: bun install
+
+            - name: Tests
+              run: bun run test
+
+            - name: Build
+              run: bun run build
+
+            - name: Upload Build Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: dist-build
+                  path: dist
+                  retention-days: 1
+
+    bump-version:
+        needs: build-and-tests
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v5
+              with:
+                  token: ${{ secrets.PAT_TOKEN }}
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: Configure Git
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+
+            - name: Bump Version
+              run: bun pm version patch --no-git-tag-version
+
+            - name: Get New Version
+              id: version
+              run: echo "new_version=$(bun -e "console.log(require('./package.json').version)")" >> $GITHUB_OUTPUT
+
+            - name: Update CHANGELOG
+              run: bun run update-changelog
+
+            - name: Commit Version Bump
+              run: |
+                  git add package.json bun.lock CHANGELOG.md
+                  git commit -m "🔖 Bump Version to ${{ steps.version.outputs.new_version }} [skip ci]"
+                  git push
+
+    publish:
+        needs: bump-version
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v5
+              with:
+                  ref: main
+
+            - name: Pull Latest Changes
+              run: git pull --ff-only origin main
+
+            - name: Download Build Artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: dist-build
+                  path: dist
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: Publish to NPM
+              run: bun publish --no-git-checks
+              env:
+                  NPM_CONFIG_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}

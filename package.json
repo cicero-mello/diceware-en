@@ -11,6 +11,7 @@
         "build": "tsup",
         "update-words": "bun run ./scripts/update-words.ts",
         "update-blacklist": "bun run ./scripts/update-blacklist.ts",
+        "update-changelog": "bun run ./scripts/update-changelog.ts",
         "demo": "bun run ./scripts/demo",
         "test": "bun test"
     },

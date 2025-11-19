@@ -3944,7 +3944,6 @@ jigsaws
 jittery
 jobs
 jockey
-jodhpur
 jogged
 jogger
 jogging
@@ -5256,6 +5255,7 @@ probe
 product
 prof
 profs
+promise
 promo
 prompt
 prone

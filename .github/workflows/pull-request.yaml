@@ -1,0 +1,27 @@
+name: CI - (Build and Tests)
+
+on:
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v5
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: Install Dependencies
+              run: bun install
+
+            - name: Tests
+              run: bun run test
+
+            - name: Build
+              run: bun run build

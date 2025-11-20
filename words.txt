@@ -2807,7 +2807,6 @@ eater
 eaters
 eating
 eats
-echelon
 echoed
 echoes
 echoey
@@ -5257,6 +5256,7 @@ prof
 profs
 promise
 promo
+promote
 prompt
 prone
 prong

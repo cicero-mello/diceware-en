@@ -55,5 +55,5 @@ console.log(
 ## Tips
 - Warn your user that sentences with negative interpretations may arise due to the randomness of words (even with a set of words avoiding huge offenses, the random combination of words can generate a sentence that can be interpreted in a pejorative way about something)
 
-## Speaks english? Fell free to improve the list! 😊
+## Do you speak English? Feel free to improve the list! 😊
 You can find more information about how to do that [here](https://gist.github.com/cicero-mello/a4fe43e43313f28f54ac16851eebd40d).

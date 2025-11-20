@@ -1,7 +1,7 @@
 {
     "name": "diceware-en",
     "description": "English diceware list with useful functions.",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "type": "module",
     "author": "Cícero Mello",
     "license": "MIT",

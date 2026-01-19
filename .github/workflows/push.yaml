@@ -7,6 +7,8 @@ on:
 
 permissions:
     contents: write
+    id-token: write # NPM OIDC
+    pull-requests: read
 
 jobs:
     build-and-tests:
@@ -44,6 +46,7 @@ jobs:
               uses: actions/checkout@v5
               with:
                   token: ${{ secrets.PAT_TOKEN }}
+                  fetch-depth: 0
 
             - name: Setup Bun
               uses: oven-sh/setup-bun@v2
@@ -55,8 +58,54 @@ jobs:
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
 
+            - name: Determine Version Bump from PR Labels
+              id: bump_type
+              run: |
+                  # Method 1: SHA commit
+                  COMMIT_SHA=$(git rev-parse HEAD)
+                  echo "Commit SHA: $COMMIT_SHA"
+
+                  PR_NUMBER=$(gh pr list --state merged --search "$COMMIT_SHA" --json number --jq '.[0].number' 2>/dev/null || echo "")
+
+                  # Method 2: Fallback - commit message
+                  if [ -z "$PR_NUMBER" ]; then
+                      echo "Trying to find PR from commit message..."
+                      PR_NUMBER=$(git log -1 --pretty=%B | grep -oP '(?:Merge pull request #|#)\K\d+' | head -1 || echo "")
+                  fi
+
+                  # Method 3: Fallback - merge commit
+                  if [ -z "$PR_NUMBER" ]; then
+                      echo "Trying to find PR from merge commit..."
+                      PR_NUMBER=$(git log -1 --pretty=%B | grep -oP '\(#\K\d+(?=\))' | head -1 || echo "")
+                  fi
+
+                  if [ -n "$PR_NUMBER" ]; then
+                      echo "✓ Found PR #$PR_NUMBER"
+                      LABELS=$(gh pr view $PR_NUMBER --json labels --jq '.labels[].name' 2>/dev/null || echo "")
+                      echo "Labels found: $LABELS"
+
+                      if echo "$LABELS" | grep -q "major"; then
+                          echo "type=major" >> $GITHUB_OUTPUT
+                          echo "✓ Bump type: MAJOR"
+                      elif echo "$LABELS" | grep -q "minor"; then
+                          echo "type=minor" >> $GITHUB_OUTPUT
+                          echo "✓ Bump type: MINOR"
+                      elif echo "$LABELS" | grep -q "patch"; then
+                          echo "type=patch" >> $GITHUB_OUTPUT
+                          echo "✓ Bump type: PATCH"
+                      else
+                          echo "type=patch" >> $GITHUB_OUTPUT
+                          echo "⚠ No version label found, defaulting to PATCH"
+                      fi
+                  else
+                      echo "type=patch" >> $GITHUB_OUTPUT
+                      echo "⚠ Not a PR merge, defaulting to PATCH"
+                  fi
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
             - name: Bump Version
-              run: bun pm version patch --no-git-tag-version
+              run: bun pm version ${{ steps.bump_type.outputs.type }} --no-git-tag-version
 
             - name: Get New Version
               id: version
@@ -94,7 +143,8 @@ jobs:
               with:
                   bun-version: latest
 
+            - name: Update npm to latest
+              run: npm install -g npm@latest
+
             - name: Publish to NPM
               run: bun publish --no-git-checks
-              env:
-                  NPM_CONFIG_TOKEN: ${{ secrets.NPM_AUTOMATION_TOKEN }}

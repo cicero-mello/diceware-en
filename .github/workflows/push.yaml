@@ -138,13 +138,14 @@ jobs:
                   name: dist-build
                   path: dist
 
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2
+            - name: Setup Node.js
+              uses: actions/setup-node@v5
               with:
-                  bun-version: latest
+                  node-version: 24
+                  registry-url: "https://registry.npmjs.org/"
 
             - name: Update npm to latest
-              run: npm install -g npm@latest
+              run: sudo npm install -g npm@latest
 
             - name: Publish to NPM
-              run: bun publish --no-git-checks
+              run: npm publish --no-git-checks

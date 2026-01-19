@@ -1,15 +1,30 @@
 import type { DicewareKey } from "./types"
 import { words } from "./words"
 
+const UINT32_MAX = 0xFFFFFFFF
+
 /**
  * Generates a random int number using crypto.getRandomValues.
- * @param max Max random int number (inclusive)
+ * @param maxValueInclusive Max random int number (inclusive)
  * @returns Random int number from 0 to max
  */
-export const getRandomInt = (max: number): number => {
-    const randomBuffer = new Uint32Array(1)
-    crypto.getRandomValues(randomBuffer)
-    return randomBuffer[0]! % (max + 1)
+export const getRandomInt = (maxValueInclusive: number): number => {
+    const totalPossibleValues = maxValueInclusive + 1
+
+    const maxAcceptableRandomValue = (
+        Math.floor(UINT32_MAX / totalPossibleValues) * totalPossibleValues
+    )
+
+    let generatedRandomValue: number
+
+    const uint32RandomBuffer = new Uint32Array(1)
+
+    do {
+        crypto.getRandomValues(uint32RandomBuffer)
+        generatedRandomValue = uint32RandomBuffer[0]!
+    } while (generatedRandomValue >= maxAcceptableRandomValue)
+
+    return generatedRandomValue % totalPossibleValues
 }
 
 const generateKey = (): DicewareKey => {
